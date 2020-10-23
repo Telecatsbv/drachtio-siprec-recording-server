@@ -19,7 +19,12 @@ else {
   srf.listen(config.get('drachtio'));
 }
 
-if (config.has('rtpengine')) {
+if (config.has('loadbalancer')) {
+  // We only parse and forward the requests to the recorders
+  logger.info(config.get('loadbalancer'), 'using loadbalancing for recording');
+  callHandler = require('./lib/loadbalancer-call-handler')(logger);
+}
+else if (config.has('rtpengine')) {
   logger.info(config.get('rtpengine'), 'using rtpengine as the recorder');
   callHandler = require('./lib/rtpengine-call-handler');
 
@@ -49,9 +54,9 @@ srf.use('options', (req, res, next) => {
   const logger = req.srf.locals.logger.child({callid});
   logger.info('Received options, reply 200 OK');
   return res.send(200, {
-    headers: { 
+    headers: {
       'Allow': allowedMethods,
-	  'Accept': 'application/sdp'
+      'Accept': 'application/sdp'
     }
   });
 });
@@ -60,16 +65,16 @@ srf.use('options', (req, res, next) => {
 //methods contains all the known SIP methods. We have our own allowedMethods (used for OPTIONS response).
 //Here we define a handler for all methods not listed in the allowedMethods.
 methods.forEach((method) => {
-	if ( ! allowedMethods.includes(method) ) {
-		logger.info(`Adding reject handler for sip method ${method}`);
-		srf.use( method.toLowerCase(), (req, res, next) => {
-			const callid = req.get('Call-ID');
-			const logger = req.srf.locals.logger.child({callid});
-			logger.info('Received unwanted method, reply 405');
-			return res.send(405);
-		} )
-	}
-} );
+  if (!allowedMethods.includes(method)) {
+    logger.info(`Adding reject handler for sip method ${method}`);
+    srf.use(method.toLowerCase(), (req, res, next) => {
+      const callid = req.get('Call-ID');
+      const logger = req.srf.locals.logger.child({callid});
+      logger.info('Received unwanted method, reply 405');
+      return res.send(405);
+    });
+  }
+});
 
 srf.invite(callHandler);
 

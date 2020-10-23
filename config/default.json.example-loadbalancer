@@ -1,0 +1,8 @@
+{
+  "drachtio": {
+    "host": "127.0.0.1",
+    "port": 9022,
+    "secret": "cymru"
+  },
+  "recorder": ["172.27.23.86"]
+}
