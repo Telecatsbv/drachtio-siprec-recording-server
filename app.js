@@ -52,7 +52,7 @@ const allowedMethods = 'INVITE, ACK, CANCEL, OPTIONS, BYE, UPDATE';
 srf.use('options', (req, res, next) => {
   const callid = req.get('Call-ID');
   const logger = req.srf.locals.logger.child({callid});
-  logger.info('Received options, reply 200 OK');
+  logger.info(`Received options from ${req.source_address}, reply 200 OK`);
   return res.send(200, {
     headers: {
       'Allow': allowedMethods,
