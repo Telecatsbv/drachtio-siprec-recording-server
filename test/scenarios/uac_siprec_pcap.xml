@@ -72,7 +72,7 @@
           <nameID aor="sip:6001@localhost"/>
           </participant>
           <participant participant_id="fLbZzLMgRXGp+F5w0hOt6w==">
-            <nameID aor="sip:101@localhost"/>
+            <nameID aor="sip:[call_number]@localhost"/>
           </participant>
           <stream stream_id="1LiAtnDVR9m469/0L4bwCA==" session_id="XoM2pKdFR8C3eX33qJKcww==">
           <label>1</label>
@@ -157,4 +157,3 @@
   <CallLengthRepartition value="10, 50, 100, 500, 1000, 5000, 10000"/>
 
 </scenario>
-
