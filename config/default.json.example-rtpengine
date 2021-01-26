@@ -10,6 +10,6 @@
       "port": 22222
     },
     "localPort": 22223,
-    "record": no
+    "record": "no"
   }
 }

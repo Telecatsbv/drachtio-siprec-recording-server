@@ -41,18 +41,13 @@ test('starting docker network..', (t) => {
 });
 
 test('siprec as a loadbalancer to recorders', (t) => {
-  t.timeoutAfter(20000);
+  t.timeoutAfter(40000);
 
 
   const vmap = `-v ${__dirname}/scenarios:/tmp`;
   const args = 'drachtio/sipp sipp -m 10 -sf /tmp/uac_siprec_pcap.xml drachtio';
   const cmd = `docker run -t --rm --name sipp1 --net test_siprec ${vmap} ${args}`;
 
-  clearRequire('..');
-  clearRequire('../lib/utils');
-  clearRequire('config');
-  process.env.NODE_CONFIG_ENV = 'test-loadbalancer';
-  const srf = require('../app');
 
   // Starting srf2
   clearRequire('..');
@@ -60,7 +55,7 @@ test('siprec as a loadbalancer to recorders', (t) => {
   clearRequire('../lib/utils');
   clearRequire('config');
   process.env.NODE_CONFIG_ENV = 'test-loadbalancer2';
-  require('../app');
+  const srf2 = require('../app');
 
   // Starting srf3
   clearRequire('..');
@@ -68,7 +63,14 @@ test('siprec as a loadbalancer to recorders', (t) => {
   clearRequire('../lib/utils');
   clearRequire('config');
   process.env.NODE_CONFIG_ENV = 'test-loadbalancer3';
-  require('../app');
+  const srf3 = require('../app');
+
+  clearRequire('..');
+  clearRequire('../lib/rtpengine-call-handler');
+  clearRequire('../lib/utils');
+  clearRequire('config');
+  process.env.NODE_CONFIG_ENV = 'test-loadbalancer';
+  const srf = require('../app');
 
   srf
     .on('connect', () => {
@@ -77,6 +79,8 @@ test('siprec as a loadbalancer to recorders', (t) => {
         .then(() => {
           t.pass('siprec with rtpengine passed');
           srf.disconnect();
+          srf2.disconnect();
+          srf3.disconnect();
           return t.end();
         })
         .catch((err) => {
@@ -88,7 +92,6 @@ test('siprec as a loadbalancer to recorders', (t) => {
       t.end(err, 'error connecting to drachtio');
     });
 }) ;
-
 
 test('stopping docker network..', (t) => {
   t.timeoutAfter(20000);
