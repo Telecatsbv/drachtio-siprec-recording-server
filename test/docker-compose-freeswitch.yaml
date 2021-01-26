@@ -37,7 +37,7 @@ services:
     networks:
       siprec:
         ipv4_address: 172.32.0.4
-        
+
   freeswitch2:
     image: davehorton/freeswitch-hairpin:latest
     command: freeswitch

@@ -22,47 +22,65 @@ const execCmd = (cmd, opts) => {
 };
 
 test('starting docker network..', (t) => {
-  t.timeoutAfter(180000);
+  t.timeoutAfter(20000);
 
-  // clear log and output directories
+  // clear log and output directores
   fs.emptyDir(`${__dirname}/tmp/log`)
     .then(fs.emptyDir(`${__dirname}/tmp/rtpengine`))
     .catch((err) => {
       console.log(`Error cleaning tmp folders: ${err}`);
       t.end(err);
     });
-  exec(`docker-compose -p test -f ${__dirname}/docker-compose-freeswitch.yaml up -d`, (err, stdout, stderr) => {
-    if (-1 != stderr.indexOf('is up-to-date')) return t.end() ;
-    console.log('docker network started, giving extra time for freeswitch to initialize...');
-    setTimeout(() => {
-      exec('docker exec freeswitch fs_cli -x "console loglevel debug"', (err, stdout, stderr) => {
-        t.end(err) ;
-      });
-    }, 18000);
+  exec(`docker-compose -p test -f ${__dirname}/docker-compose-loadbalance.yaml up -d`, (err, stdout, stderr) => {
+    if (-1 != stderr.indexOf('is up-to-date')) return t.end();
+    console.log(stdout);
+    //console.log(stderr);
+    t.pass('Docker rtpengine started');
+    t.end();
   });
 });
 
-test('siprec with freeswitch recorder', (t) => {
-  t.timeoutAfter(20000);
+test('siprec as a loadbalancer to recorders', (t) => {
+  t.timeoutAfter(40000);
 
-  clearRequire('..');
-  clearRequire('../lib/utils');
-  clearRequire('config');
-  process.env.NODE_CONFIG_ENV = 'test2';
 
   const vmap = `-v ${__dirname}/scenarios:/tmp`;
-  const args = 'drachtio/sipp sipp -m 1 -sf /tmp/uac_siprec_pcap2.xml drachtio';
+  const args = 'drachtio/sipp sipp -m 10 -sf /tmp/uac_siprec_pcap.xml drachtio';
   const cmd = `docker run -t --rm --name sipp1 --net test_siprec ${vmap} ${args}`;
 
-  const srf = require('..');
+
+  // Starting srf2
+  clearRequire('..');
+  clearRequire('../lib/rtpengine-call-handler');
+  clearRequire('../lib/utils');
+  clearRequire('config');
+  process.env.NODE_CONFIG_ENV = 'test-loadbalancer2';
+  const srf2 = require('../app');
+
+  // Starting srf3
+  clearRequire('..');
+  clearRequire('../lib/rtpengine-call-handler');
+  clearRequire('../lib/utils');
+  clearRequire('config');
+  process.env.NODE_CONFIG_ENV = 'test-loadbalancer3';
+  const srf3 = require('../app');
+
+  clearRequire('..');
+  clearRequire('../lib/rtpengine-call-handler');
+  clearRequire('../lib/utils');
+  clearRequire('config');
+  process.env.NODE_CONFIG_ENV = 'test-loadbalancer';
+  const srf = require('../app');
+
   srf
     .on('connect', () => {
-
       console.log(`cmd: ${cmd}`);
       execCmd(cmd)
         .then(() => {
-          t.pass('siprec with freeswitch passed');
+          t.pass('siprec with rtpengine passed');
           srf.disconnect();
+          srf2.disconnect();
+          srf3.disconnect();
           return t.end();
         })
         .catch((err) => {
@@ -77,7 +95,7 @@ test('siprec with freeswitch recorder', (t) => {
 
 test('stopping docker network..', (t) => {
   t.timeoutAfter(20000);
-  exec(`docker-compose -p test -f ${__dirname}/docker-compose-freeswitch.yaml down`, (err, stdout, stderr) => {
+  exec(`docker-compose -p test -f ${__dirname}/docker-compose-loadbalance.yaml down`, (err, stdout, stderr) => {
     console.log(stdout);
     //console.log(stderr);
     t.pass('Stopped docker compose') ;
@@ -85,6 +103,10 @@ test('stopping docker network..', (t) => {
   exec('docker rm -f sipp1', (err, stdout) => {
     console.log(stdout);
     t.pass('Forced down sipp1');
+  });
+  exec('docker rm -f sipp2', (err, stdout) => {
+    console.log(stdout);
+    t.pass('Forced down sipp2');
   });
   setTimeout(() => {
     console.log('Give docker time to stop the images');
