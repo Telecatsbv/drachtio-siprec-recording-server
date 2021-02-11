@@ -49,3 +49,12 @@ services:
     networks:
       siprec:
         ipv4_address: 172.32.0.5
+
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "9379:6379/tcp"
+    networks:
+      siprec:
+        ipv4_address: 172.32.0.6

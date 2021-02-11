@@ -47,6 +47,11 @@ test('siprec with rtpengine recorder', (t) => {
   const args = 'drachtio/sipp sipp -m 1 -sf /tmp/uac_siprec_pcap.xml drachtio';
   const cmd = `docker run -t --rm --name sipp1 --net test_siprec ${vmap} ${args}`;
 
+  clearRequire('..');
+  clearRequire('../lib/rtpengine-call-handler');
+  clearRequire('../lib/utils');
+  clearRequire('config');
+  process.env.NODE_CONFIG_ENV = 'test';
   const srf = require('../app');
   srf
     .on('connect', () => {

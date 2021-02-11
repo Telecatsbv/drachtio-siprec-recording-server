@@ -2,8 +2,6 @@ const test = require('blue-tape');
 const { exec } = require('child_process');
 const debug = require('debug')('drachtio:siprec-recording-server');
 const clearRequire = require('clear-require');
-//const test = require('tape').test ;
-//const exec = require('child_process').exec ;
 const fs = require('fs-extra');
 
 

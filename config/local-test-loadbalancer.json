@@ -4,6 +4,11 @@
     "port": 9023,
     "secret": "cymru"
   },
+  "redis" : {
+    "host": "127.0.0.1",
+    "port": 9379,
+    "pass": ""
+  },
   "loadbalancer": ["172.32.0.3"],
   "ddi": {
     "1": "172.32.0.5",

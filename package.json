@@ -41,9 +41,12 @@
     "tape": "^4.9.1"
   },
   "dependencies": {
+    "await": "^0.2.6",
     "config": "^1.30.0",
     "debug": "^3.1.0",
     "drachtio-srf": "^4.4.3",
+    "flipr": "^2.2.1",
+    "flipr-yaml": "^2.0.1",
     "pino": "^4.13.0",
     "redis": "^2.8.0",
     "rtpengine-client": "0.0.6",
