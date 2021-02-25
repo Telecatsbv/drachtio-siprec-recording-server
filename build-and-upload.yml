@@ -1,0 +1,19 @@
+---
+  - hosts: localhost
+    vars:
+      repo: albertheijnpartners.azurecr.io/albertheijnpartners/
+      name: telecats-siprec-server
+      version: "0.1.7"
+      registry_url: {{ repo }}{{ name }}:{{ version }}
+    tasks:
+      - name: Build image and push it to repository
+        docker_image:
+          build:
+            path: "{{ playbook_dir }}"
+            pull: no
+          name: "{{ registry_url }}"
+          tag: "{{ version }}"
+          push: yes
+          source: build
+          force_source: yes
+          state: present
