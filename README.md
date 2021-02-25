@@ -83,7 +83,7 @@ It is now possible to create a docker image for the SIPREC server which can eith
 `ansible-playbook build-and-upload.yml`
 
 To use the image, environment config is required instead of a local config file. For example in Kubernetes the following ENV var would bootstrap the config at startup:
-    environmentVariables:
+```    environmentVariables:
       - name: NODE_CONFIG
         value: '{
                   "drachtio": {
@@ -100,6 +100,7 @@ To use the image, environment config is required instead of a local config file.
                     "record": "yes"
                   }
                 }'
+```
 
 ## Installation with Ansible
 Installation on a Linux host can be achieved with Ansible. An Ansible role is available [ansible-role-siprec](https://github.com/Telecatsbv/ansible-role-siprec) which uses pm2 as NPM daemon. Config is templated and can be filled in with vars. Consult the role README for more information.
