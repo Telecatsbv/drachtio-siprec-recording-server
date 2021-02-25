@@ -2,7 +2,8 @@
 
 An open source implementation of a SIPREC recording server based on [dractio](https://drachtio.org) and using either
 * [rtpengine](https://github.com/sipwise/rtpengine) or
-* [Freeswitch](https://freeswitch.com/)
+* [Freeswitch](https://freeswitch.com/) or
+* Load balancing mode: Send traffic to the next SIPREC server
 as the back-end recording system.
 
 ## Install
@@ -44,6 +45,10 @@ An example snippet of a dialplan that does the trick looks like this:
 For an example docker image that implements, see [davehorton/freeswitch-hairpin](https://hub.docker.com/r/davehorton/freeswitch-hairpin/).
 
 > Note: when using Freeswitch, the application requires access to a redis server.  redis is used to track and correlate the A and B call legs, using the X-Return-Token header mentioned above.  When using rtpengine as the back-end, redis not required.
+
+## Using Load balancing mode
+When using this mode the SIPREC traffic gets parsed and then forwarded to the next SIPREC server. This can either be Round Robin or based on DDI. Example configuration is available. The next hop SIPREC server is set-up with RTPEngine or Freeswitch to actually record the call.
+
 ### Using dockerized versions of drachtio and rtpengine
 
 If you haven't built the [drachtio server](https://github.com/davehorton/drachtio-server) and rtpengine processes (and don't want to), you can run using these docker images:
@@ -57,6 +62,8 @@ This application has been tested with the following SIPREC clients:
 * Ribbon SBC 5200 (tested with Freeswitch back-end media server)
 * OpenSIPS (tested with rtpengine and Freeswitch back-end media servers)
 * Cisco Unified Border element (tested with rtpengine back-end media server)
+* Avaya SBC (Acme)
+* Audiocodes SBC
 ## Test
 
 `npm test` 
@@ -65,12 +72,34 @@ Note: docker is required to run the test cases
 
 ## How it works
 
-The application receives the SIPREC INVITE from the SBC (or other SIPREC recording client), which will contain the multipart body with both SDP and XML metadata.  The application parses the SDP to retrieve the two media endpoints that will be streaming from the SDP.  What happens next is different depending on whether rtpengine or Freeswitch is being used.
+The application receives the SIPREC INVITE from the SBC (or other SIPREC recording client), which will contain the multipart body with both SDP and XML metadata.  The application parses the SDP to retrieve the two media endpoints that will be streaming from the SDP.  What happens next is different depending on whether rtpengine, Freeswitch or loadbalancing is being used.
 
 When using rtpengine, the application creates two associated media endpoints on rtpengine (using the 'offer' and 'answer' commands in the ng protocol).  The two media endpoints created by rtpengine are then combined into a multipart body 200 OK response that is returned to the SBC.  The end result is that the caller media flows are directed to one of the rtpengin endpoints and the callee media flows to the other. The result is a recording made by rtpengine as if the caller and callee media flows were part of a call setup with rtpengine as a media proxy.
 
 When using Freeswitch the same basic approach of sending the two media flows through Freeswitch as if it were a normal bridged call applies.  In this case, the application sends an INVITE to the Freeswitch with one of the SDPs parsed from the SIPREC body and Freeswitch is responsible for generating a B leg back towards the drachtio server.  Upon receving this B leg INVITE, the application answers 200 OK with remaining SDP parsed from the SIPREC body.  A final 200 OK answer back to the SIPREC client is then generated, using the two media endpoints allocated on the Freeswitch.  Media flows through the bridge connection and is recorded, as if caller were talking to callee through the Freeswitch.
 
+## Docker image
+It is now possible to create a docker image for the SIPREC server which can either run stand-alone or in a Kubernetes environment. A Dockerfile is present which builds the image locally, or one can use the Ansible playbook to build and upload the image to a specific Docker hub with 1 line. Be sure to change the Repo URL accordingly.
+`ansible-playbook build-and-upload.yml`
 
+To use the image, environment config is required instead of a local config file. For example in Kubernetes the following ENV var would bootstrap the config at startup:
+    environmentVariables:
+      - name: NODE_CONFIG
+        value: '{
+                  "drachtio": {
+                    "host": "< ip or service name>",
+                    "port": 9022,
+                    "secret": "< pass >"
+                  },
+                  "rtpengine" : {
+                    "remote": {
+                      "host": "< ip or service name>",
+                      "port": 22222
+                    },
+                    "localPort": 23333,
+                    "record": "yes"
+                  }
+                }'
 
-
+## Installation with Ansible
+Installation on a Linux host can be achieved with Ansible. An Ansible role is available [ansible-role-siprec](https://github.com/Telecatsbv/ansible-role-siprec) which uses pm2 as NPM daemon. Config is templated and can be filled in with vars. Consult the role README for more information.
