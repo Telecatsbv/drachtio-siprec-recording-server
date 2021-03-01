@@ -40,6 +40,7 @@ function parseAndVerifyPayload(filename, delimiter, t) {
       t.ok(obj.caller.aor, 'parsed caller aor');
       t.ok(obj.sessionId, `parsed session id ${obj.sessionId}`);
       t.ok(obj.recordingSessionId, `parsed recording session id: ${obj.recordingSessionId}`);
+      t.ok(obj.ucid, `parsed ucid: ${obj.ucid}`);
       t.end();
       return;
     })
@@ -58,7 +59,6 @@ test('parser: Promcomm SIPREC payload', (t) => {
 test('parser: Sonus SIPREC payload', (t) => {
   parseAndVerifyPayload('sonus-siprec-offer.txt', '--sonus-content-delim', t) ;
 }) ;
-
 test('parser: Cisco SIPREC payload', (t) => {
   parseAndVerifyPayload('cisco-siprec-offer.txt', '--uniqueBoundary', t) ;
 }) ;
@@ -73,6 +73,12 @@ test('parser: Connectel SIPREC payload (3)', (t) => {
 }) ;
 test('parser: Avaya SIPREC payload', (t) => {
   parseAndVerifyPayload('avaya-siprec-offer.txt', '--unique-boundary-1', t) ;
+}) ;
+test('parser: Audiocodes SIPREC payload (1)', (t) => {
+  parseAndVerifyPayload('audiocodes-siprec-offer.txt', '--boundary_ac1607', t) ;
+}) ;
+test('parser: Audiocodes SIPREC payload (2)', (t) => {
+  parseAndVerifyPayload('audiocodes-siprec-offer2.txt', '--boundary_ac1cc0', t) ;
 }) ;
 test('combiner: sample (1)', (t) => {
   combineAndVerifyPayloads('sample-sdps.txt', '__split_here__', t) ;
