@@ -24,6 +24,11 @@ if (config.has('loadbalancer')) {
   logger.info(config.get('loadbalancer'), 'using loadbalancing for recording');
   callHandler = require('./lib/loadbalancer-call-handler')(logger);
 }
+else if (config.has('loadbalancerddi')) {
+  // We only parse and forward the requests to the recorders, based on DDI
+  logger.info(config.get('loadbalancerddi'), 'using loadbalancing DDI for recording');
+  callHandler = require('./lib/loadbalancerddi-call-handler')(logger);
+}
 else if (config.has('rtpengine')) {
   logger.info(config.get('rtpengine'), 'using rtpengine as the recorder');
   callHandler = require('./lib/rtpengine-call-handler');

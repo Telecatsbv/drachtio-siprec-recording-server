@@ -10,6 +10,7 @@
       "port": 33333
     },
     "localPort": 22223,
-    "record": "no"
+    "record": "no",
+    "mediaAddress": "auto"
   }
 }

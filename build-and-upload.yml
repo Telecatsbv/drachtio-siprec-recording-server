@@ -1,10 +1,11 @@
 ---
   - hosts: localhost
     vars:
-      repo: ....
+      repo:
+      # repo: albertheijnpartners.azurecr.io/albertheijnpartners
       name: telecats-siprec-server
-      version: "0.1.7"
-      registry_url: {{ repo }}{{ name }}:{{ version }}
+      version: "0.1.29"
+      registry_url: "{{ repo }}/{{ name }}:{{ version }}"
     tasks:
       - name: Build image and push it to repository
         docker_image:

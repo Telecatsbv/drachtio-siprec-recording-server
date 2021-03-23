@@ -9,15 +9,16 @@
       "remote": {
         "host": "127.0.0.1",
         "port": 33333
-      }
+      },
+      "localPort": 22233,
+      "record": "no"
     },
     {
       "remote": {
         "host": "127.0.0.1",
         "port": 44444
-      }
-    },
-    {
+      },
+      "localPort": 22244,
       "record": "no"
     }
   ]
