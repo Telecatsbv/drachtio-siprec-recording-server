@@ -1,0 +1,61 @@
+
+--boundary_ac1607
+Content-Type: application/sdp
+
+v=0
+o=AudiocodesGW 1179182390 2107247452 IN IP4 151.184.128.136
+s=SBC-Call
+c=IN IP4 151.184.128.136
+t=0 0
+m=audio 6240 RTP/AVP 8 101
+c=IN IP4 151.184.128.136
+a=ptime:20
+a=sendonly
+a=label:1
+a=rtpmap:8 PCMA/8000
+a=rtpmap:101 telephone-event/8000
+a=fmtp:101 0-15,16
+m=audio 6250 RTP/AVP 8 101
+c=IN IP4 151.184.128.136
+a=ptime:20
+a=sendonly
+a=label:2
+a=rtpmap:8 PCMA/8000
+a=rtpmap:101 telephone-event/8000
+a=fmtp:101 0-15,16
+
+--boundary_ac1607
+Content-Type: application/rs-metadata
+Content-Disposition: recording-session
+
+<?xml version="1.0" encoding="UTF-8"?>
+<recording xmlns="urn:ietf:params:xml:ns:recording" xmlns:ac="http://AudioCodes">
+  <datamode>complete</datamode>
+  <group id="00000000-0000-00c2-b0f3-150000285541">
+    <associate-time>2021-03-01T09:40:12</associate-time>
+  </group>
+  <session id="0000-0000-0000-0000-b93dc1ceff1d1459">
+    <group-ref>00000000-0000-00c2-b0f3-150000285541</group-ref>
+    <associate-time>2021-03-01T09:40:12</associate-time>
+    <ac:AvayaUCID xmlns="urn:ietf:params:xml:ns:Avaya">YMMYTHBSHLHTEKNKJU4OIGEYBREHSHH3BJS3</ac:AvayaUCID>
+  </session>
+  <participant id="+31534889935" session="0000-0000-0000-0000-b93dc1ceff1d1459">
+    <nameID aor="+31534889935@ims.imscore.net"></nameID>
+    <associate-time>2021-03-01T09:40:12</associate-time>
+    <send>00000000-2274-00c2-b0f3-150000285541</send>
+    <recv>00000001-aece-00c2-b0f3-150000285541</recv>
+  </participant>
+  <participant id="+31886601071" session="0000-0000-0000-0000-b93dc1ceff1d1459">
+    <nameID aor="+31886601071@199.103.12.213"></nameID>
+    <associate-time>2021-03-01T09:40:12</associate-time>
+    <send>00000001-aece-00c2-b0f3-150000285541</send>
+    <recv>00000000-2274-00c2-b0f3-150000285541</recv>
+  </participant>
+  <stream id="00000000-2274-00c2-b0f3-150000285541" session="0000-0000-0000-0000-b93dc1ceff1d1459">
+    <label>1</label>
+  </stream>
+  <stream id="00000001-aece-00c2-b0f3-150000285541" session="0000-0000-0000-0000-b93dc1ceff1d1459">
+    <label>2</label>
+  </stream>
+</recording>
+--boundary_ac1607--
