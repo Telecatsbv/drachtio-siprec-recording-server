@@ -56,7 +56,7 @@ else {
 const allowedMethods = 'INVITE, ACK, CANCEL, OPTIONS, BYE, UPDATE';
 srf.use('options', (req, res, next) => {
   const callid = req.get('Call-ID');
-  const logger = req.srf.locals.logger.child({callid});
+  // const logger = req.srf.locals.logger.child({callid});
   logger.info(`Received options from ${req.source_address}, reply 200 OK`);
   return res.send(200, {
     headers: {
@@ -74,7 +74,7 @@ methods.forEach((method) => {
     logger.info(`Adding reject handler for sip method ${method}`);
     srf.use(method.toLowerCase(), (req, res, next) => {
       const callid = req.get('Call-ID');
-      const logger = req.srf.locals.logger.child({callid});
+      // const logger = req.srf.locals.logger.child({callid});
       logger.info('Received unwanted method, reply 405');
       return res.send(405);
     });
